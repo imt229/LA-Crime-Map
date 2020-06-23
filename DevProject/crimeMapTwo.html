@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>LA Crime Map</title>
+		<link href="./resources/css/crimeMapTwo.css" type="text/css" rel="stylesheet">
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
+		<script src="https://js.arcgis.com/4.15/"></script>
+		<link rel = "stylesheet" href = "http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+	</head>
+
+	<body>
+		<!--
+		<header>
+			<p> LA Crime Map </p>
+			<br>
+
+		</header>
+		-->
+
+		<main>
+
+			<section id = "sidebar">
+				<br/>
+				<div id = "crimeType">
+					
+					<div class = "optionHeaderWrapper"> 
+						<h2 class = "optionTitle"> <i class="fa fa-arrow-left" id = "crimeArrow"></i> Crime Type </h2> 
+						<h2 class = "currentlySelected"> All </h2> 
+					</div>
+					<br/>
+					<form class = "options" id = "crimeOptions">
+						<input type = "radio" id = "all"  name = "crimeType" value = "all" checked> 
+						<label for = "shoplifting"> All </label> <br/>
+						<input type = "radio" id = "shoplifting"  name = "crimeType" value = "shoplifting">
+						<label for = "shoplifting"> Shoplifting </label> <br/>
+						<input type = "radio" id = "assault"  name = "crimeType" value = "assault">
+						<label for = "assault"> Assault </label> <br/>
+						<input type = "radio" id = "rape"  name = "crimeType" value = "rape">
+						<label for = "rape"> Rape </label> <br/>
+						<input type = "radio" id = "kidnapping"  name = "crimeType" value = "kidnapping">
+						<label for = "kidnapping"> Kidnapping </label> <br/>
+						<input type = "radio" id = "homicide"  name = "crimeType" value = "homicide">
+						<label for = "homicide"> Homicide </label> <br/>
+					</form>
+				</div>
+			
+
+			</section>
+			<div id="viewDiv">
+
+			</div>
+		</main>
+		<script type="text/javascript" src="./resources/javascript/crimeMapTwo.js"> </script>
+	</body>
+
+</html>

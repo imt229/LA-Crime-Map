@@ -1,0 +1,83 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+}
+
+body {
+  background-color:#D4DADC;
+}
+
+
+#sidebar{
+  padding-left: 20px;
+  background-color: #FFFFFF;
+  width: 250px;
+  height: 100vh;
+  min-width: 250px;
+}
+
+.options{
+  padding-left: 20px;
+  padding-top: 10px;
+}
+
+
+.arrow{
+  /*
+  border-radius: 100%;
+  border-color: black;
+  border-style: solid;
+  text-align: center;
+  */
+  transform: rotateZ(270deg);
+}
+
+
+#crimeArrow{
+  transform: rotateZ(180deg);
+  transition: all 0.4s ease;
+}
+
+
+.arrow{
+  /*
+  border-radius: 100%;
+  border-color: black;
+  border-style: solid;
+  text-align: center;
+  */
+  transform: rotateZ(90deg);
+}
+
+.options{
+  display: none;
+  height: 0px;
+  width: 220px;
+  overflow: hidden;
+  background-color: #444857;
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.optionHeaderWrapper{
+  clear: both;
+}
+
+.optionTitle{
+  float: left;
+}
+
+.currentlySelected{
+  float: right;
+  margin-right: 20px;
+  text-transform: capitalize;
+}
+
