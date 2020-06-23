@@ -62,14 +62,12 @@ var displayCrimeType = false;
 document.querySelector(".optionHeaderWrapper").addEventListener("click", () =>{
   var crimeForm = document.querySelector("#crimeOptions");
   if (displayCrimeType){
-    crimeForm.style.display = "none";
     crimeForm.style.height = "0px";
     crimeForm.style.opacity = "0%";
     document.querySelector("#crimeArrow").style.transform = "rotateZ(180deg)";
     displayCrimeType = false;
   } else {
-    crimeForm.style.display = "block";
-    crimeForm.style.height = "100%";
+    crimeForm.style.height = "125px";
     crimeForm.style.opacity = "100%";
     crimeForm.style.transform = "translateY(0)";
     displayCrimeType = true;

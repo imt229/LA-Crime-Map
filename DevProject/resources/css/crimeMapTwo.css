@@ -24,11 +24,6 @@ body {
   min-width: 250px;
 }
 
-.options{
-  padding-left: 20px;
-  padding-top: 10px;
-}
-
 
 .arrow{
   /*
@@ -58,6 +53,8 @@ body {
 }
 
 .options{
+  padding-left: 20px;
+  padding-top: 10px
   display: none;
   height: 0px;
   width: 220px;
