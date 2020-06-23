@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Oxygen', sans-serif;
+  
 }
 
 html, body, #viewDiv {
@@ -17,7 +19,8 @@ body {
 
 
 #sidebar{
-  padding-left: 20px;
+  padding-left: 2px;
+  padding-right: 2px;
   background-color: #FFFFFF;
   width: 250px;
   height: 100vh;
@@ -70,11 +73,22 @@ body {
 
 .optionTitle{
   float: left;
+  font-size: 20px;
 }
 
 .currentlySelected{
   float: right;
   margin-right: 20px;
   text-transform: capitalize;
+  font-size: 15px;
+  vertical-align: middle;
+  line-height: 26px;
+}
+
+#crimeType{
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 1px;
+  border-collapse: separate; 
 }
 
