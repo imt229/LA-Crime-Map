@@ -1,3 +1,4 @@
+  
 <!DOCTYPE html>
 <html>
 
@@ -10,22 +11,31 @@
 		<script src="https://js.arcgis.com/4.15/"></script>
 		<link rel = "stylesheet" href = "http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
 		<link href="https://fonts.googleapis.com/css2?family=Oxygen&display=swap" rel="stylesheet">
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+		<script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdGgvFCnqZWudbD4uMIa_hbuzVAMWrv6g&callback=initMap"
+      defer
+    ></script>
+		
 	</head>
+
+	
 
 	<body>
 		<!--
 		<header>
 			<p> LA Crime Map </p>
 			<br>
-
 		</header>
 		-->
 
-		<main>
 
-			<section id = "sidebar">
+		<div id="viewDiv">
+		</div>
+			
+			
 				<br/>
-				<div id = "crimeType">
+				<div id = "crimeType" class = "sidebar">
 					
 					<div class = "optionHeaderWrapper"> 
 						<h2 class = "optionTitle"> <i class="fa fa-arrow-left" id = "crimeArrow"></i> Crime Type </h2> 
@@ -46,14 +56,10 @@
 						<input type = "radio" id = "homicide"  name = "crimeType" value = "homicide">
 						<label for = "homicide"> Homicide </label> <br/>
 					</form>
-				</div>
+				</div> 
 			
 
-			</section>
-			<div id="viewDiv">
-
-			</div>
-		</main>
+		
 		<script type="text/javascript" src="./resources/javascript/crimeMapTwo.js"> </script>
 	</body>
 
