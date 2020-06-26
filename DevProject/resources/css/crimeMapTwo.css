@@ -6,6 +6,7 @@
   
 }
 
+/*Map Formatting */
 html, body, #viewDiv {
   padding: 0;
   margin: 0;
@@ -18,11 +19,24 @@ html, body, #viewDiv {
   width: 100%;
 }
 
+main{
+  position: relative;
+}
+
 
 body {
   background-color:#D4DADC;
 }
 
+#banner{
+  margin: auto;
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  text-align: center;
+}
+
+/*Option Formatting */
 .sidebar{
   margin-left: 5px;
   padding-left: 2px;
@@ -34,29 +48,14 @@ body {
   position: absolute;
 }
 
-main{
-  position: relative;
-}
 .arrow{
 
   transform: rotateZ(270deg);
 }
 
-
 #crimeArrow{
   transform: rotateZ(180deg);
   transition: all 0.4s ease;
-}
-
-.options{
-  padding-left: 20px;
-  padding-top: 10px;
-  height: 0px;
-  width: 220px;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 1s ease;
-  color: #E6E7E7;
 }
 
 .optionHeaderWrapper{
@@ -70,11 +69,23 @@ main{
 
 .currentlySelected{
   float: right;
-  margin-right: 20px;
   text-transform: capitalize;
   font-size: 15px;
   vertical-align: middle;
   line-height: 26px;
+  padding-right: 4px;
+
+}
+
+.options{
+  padding-left: 20px;
+  padding-top: 10px;
+  height: 0px;
+  width: 220px;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 1s ease;
+  color: #E6E7E7;
 }
 
 #crimeType{
