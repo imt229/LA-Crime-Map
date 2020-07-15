@@ -1,5 +1,6 @@
 console.log("Javascript linked!");
 
+var map;
 var view;
 require([
       "esri/Map",
@@ -7,7 +8,7 @@ require([
       "esri/layers/FeatureLayer"
     ], function(Map, MapView, FeatureLayer) {
 
-    var map = new Map({
+    map = new Map({
       basemap: "topo-vector"
     });
 
@@ -41,9 +42,9 @@ require([
             type: "simple-fill",
             color: "#c06c84",
           }
-        },
+        }, 
         opacity: 0.5,
-        outFields: ["*"],
+        outFields: ["*"], //Put all fields as outfields
         popupTemplate: {  // Enable a popup
            title:  "{APREC}", // Show attribute value
            content: "PREC: {PREC} </br> Area: {AREA} miles squared"  // Display in pop-up
@@ -52,6 +53,13 @@ require([
 
     map.add(areaFill);
     map.add(areaOutlines);
+    
+    //var zoomWidget = new Zoom({
+    //  view: view
+    //});
+
+    //view.ui.add(zoomWidget, "top-right");
+    view.ui.move("zoom", "bottom-right");
 
   });
 
@@ -75,11 +83,14 @@ document.querySelector(".optionHeaderWrapper").addEventListener("click", () =>{
   }
 })
 
+
+//Attach click function to radio elements
 var crimeTypeSelection = document.getElementsByName("crimeType");
 for (let i = 0; i < crimeTypeSelection.length; i++){
   crimeTypeSelection[i].addEventListener("click", crimeSelectionChange);
 }  
 
+//Change of crime type
 function crimeSelectionChange(){
   for (let i = 0; i < crimeTypeSelection.length; i++){
     if (crimeTypeSelection[i].checked){
