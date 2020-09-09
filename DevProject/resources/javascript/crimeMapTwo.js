@@ -137,10 +137,6 @@ require([
     statisticType: "max"
   };
 
-  var countStatDef = {
-    statisticType: "count",
-    outStatisticFieldName: "COUNT",
-  };
 
   const areaNames = ["77th Street", "Central", "Southwest", "Pacific", "Southeast", "Newton", "N Hollywood", "Hollywood", "Olympic", "Wilshire", "Rampart", "West LA", "Van Nuys", "Harbor", "Northeast", "Mission", "Topanga", "West Valley", "Hollenbeck", "Devonshire", "Foothill"];
   var areaDict = {};
@@ -173,31 +169,7 @@ require([
     });
   }
 
-  
 
-  
-  queryTwo = {
-    where: "APREC = 'North Hollywood'",
-    returnGeometry: true,
-  }
-  areaFill.queryFeatures(queryTwo).then(function(result){
-    //console.log(typeof result);
-
-    console.log(result.features)
-    var geo = result.features[0].geometry;
-    var grap = new Graphic({
-      geometry: geo,
-      symbol: {
-        type: "simple-fill",
-        color: "#FFFFFF",
-      }
-    });
-    var gLayer = new GraphicsLayer({
-      graphics: [grap]
-    });
-    //map.add(gLayer);
-    //gLayer.removeAll();
-  });
   
   var areaFillView;
   view.whenLayerView(areaFill).then(function(layerView){
