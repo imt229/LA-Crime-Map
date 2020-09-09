@@ -2,27 +2,30 @@ console.log("Javascript linked!");
 var areaFill;
 var map;
 var view;
+var graphicsLayer
 require([
   "esri/Map",
   "esri/views/MapView",
   "esri/layers/FeatureLayer",
   "esri/layers/CSVLayer",
-], function (Map, MapView, FeatureLayer, CSVLayer) {
+  "esri/layers/GraphicsLayer",
+  "esri/Graphic"
+], function (Map, MapView, FeatureLayer, CSVLayer, GraphicsLayer, Graphic) {
 
 
   var trailheadsLabels = {
     symbol: {
       type: "text",
-      color: "#C70039",
-      haloColor: "#900C3E",
-      haloSize: "1px",
+      color: "#3d6da2",
+      haloColor: "#FFFFFF",
+      haloSize: "0.5px",
       font: {
         size: "10px",
         family: "Noto Sans",
-        weight: "normal"
+        weight: "bold"
       }
     },
-    labelPlacement: "center-center",
+    labelPlacement: "always-horizontal",
     labelExpressionInfo: {
       expression: "$feature.APREC"
     }
@@ -30,7 +33,7 @@ require([
 
   map = new Map({
     //basemap: "topo-vector"
-    basemap: "streets-night-vector"
+    basemap: "gray-vector"
   });
 
   view = new MapView({
@@ -50,7 +53,8 @@ require([
         color: "#FFC300",
         width: "2px",
       }
-    }
+    },
+    id: "outline"
 
   });
 
@@ -64,20 +68,25 @@ require([
         color: "#571845",
       }
     },
-    opacity: 0.5,
+    opacity: 0,
     outFields: ["*"], //Put all fields as outfields
     popupTemplate: {  // Enable a popup
       title: "{APREC}", // Show attribute value
       content: "PREC: {PREC} </br> Area: {AREA} miles squared"  // Display in pop-up
     },
-    labelingInfo: [trailheadsLabels]
+    labelingInfo: [trailheadsLabels],
+    id: "fill"
+  });
+
+  var graphicsLayer = new GraphicsLayer({
+    opacity: 0.75
   });
 
 
-
-
   map.add(areaFill);
+  //areaFill.definitionExpression = `APREC = 'Pacific'`
   map.add(areaOutlines);
+  map.add(graphicsLayer);
 
   //var zoomWidget = new Zoom({
   //  view: view
@@ -116,10 +125,16 @@ require([
   countStatDef.onStatisticField = "'AREA' = '03'";
   countStatDef.outStatisticFieldName = "numBlockGroups";*/
 
-  var sumPopulation = {
+  var crimeCount = {
     onStatisticField: "Area_Name",  // service field for 2015 population
     outStatisticFieldName: "areaCount",
     statisticType: "count"
+  };
+
+  var getAreaName = {
+    onStatisticField: "Area_Name",  // service field for 2015 population
+    outStatisticFieldName: "name",
+    statisticType: "max"
   };
 
   var countStatDef = {
@@ -128,25 +143,78 @@ require([
   };
 
   const areaNames = ["77th Street", "Central", "Southwest", "Pacific", "Southeast", "Newton", "N Hollywood", "Hollywood", "Olympic", "Wilshire", "Rampart", "West LA", "Van Nuys", "Harbor", "Northeast", "Mission", "Topanga", "West Valley", "Hollenbeck", "Devonshire", "Foothill"];
-  var areaTally = [];
   var areaDict = {};
-
   var index = 0;
+  var max = 0;
+  var min = 0;
   for (areaName of areaNames) {
     var query = crimeData.createQuery();
     query.where = `Area_Name = '${areaName}'`;
-
-    query.outStatistics = [sumPopulation];
+    query.outStatistics = [crimeCount, getAreaName];
 
 
     crimeData.queryFeatures(query).then(function (response) {
       var stats = response.features[0].attributes;
-      areaTally.push(stats.areaCount);
-      console.log(`${areaNames[index]} : ${stats.areaCount}`)
+      var name = stats.name;
+      if (name == "West LA"){name = "West Los Angeles"};
+      if (name == "N Hollywood"){name = "North Hollywood"};
+      areaDict[name] = stats.areaCount;
+      if (max == 0){
+        max = stats.areaCount;
+        min = stats.areaCount;
+      } else{
+        if(stats.areaCount > max){ max = stats.areaCount;}
+        if(stats.areaCount < min){ min = stats.areaCount;}
+      }
       index++;
+      if (index == 21){
+        split(max, min);
+      }
     });
   }
 
+  
+
+  
+  queryTwo = {
+    where: "APREC = 'North Hollywood'",
+    returnGeometry: true,
+  }
+  areaFill.queryFeatures(queryTwo).then(function(result){
+    //console.log(typeof result);
+
+    console.log(result.features)
+    var geo = result.features[0].geometry;
+    var grap = new Graphic({
+      geometry: geo,
+      symbol: {
+        type: "simple-fill",
+        color: "#FFFFFF",
+      }
+    });
+    var gLayer = new GraphicsLayer({
+      graphics: [grap]
+    });
+    //map.add(gLayer);
+    //gLayer.removeAll();
+  });
+  
+  var areaFillView;
+  view.whenLayerView(areaFill).then(function(layerView){
+    areaFillView = layerView;
+    //areaFillView.filter = {where: "APREC = 'PACIFIC'"};
+ 
+    /*areaFillView.effect = {
+      filter: {
+        where: "APREC = 'PACIFIC'"
+      },
+      //includedEffect: "color(#FFFFFF)",
+      excludedLabelsVisible: "true"
+    }
+    console.log(areaFill.fields[0].name)*/
+    });
+
+  //crimeData.filter = {where: "APREC = 'PACIFIC'"};
 
   //Print 
   /*
@@ -160,8 +228,81 @@ require([
   //console.log(foo.load().toJson())
   //map.add(layer)
 
-});
 
+  function split(max, min){
+    var difference = max - min;
+    var sectionSize = difference/5;
+    var upperBoundArray = [];
+    var currentBound = min;
+    var colorDict = {}
+    for (var i = 0; i < 5; i++){
+      currentBound += sectionSize;
+      upperBoundArray.push(currentBound);
+    }
+    //map.removeAll();
+    //console.log(map.findLayerById("fill").renderer.symbol.color)
+    graphicsLayer.removeAll();
+    for(key in areaDict){
+      //Getting color
+      //const colors = [ "#3a4d6b", "#3d6da2", "#799a96", "#ccbe6a", "#ffec99" ];
+      const colors = [ "#4e4400", "#7a6a00", "#a79100", "#d3b700", "#ffdd00" ];
+      var color;
+      var count = areaDict[key];
+      if (count < upperBoundArray[0]){ color = colors[4]}
+      else if (count < upperBoundArray[1]) {color = colors[3]}
+      else if (count < upperBoundArray[2]) {color = colors[2]}
+      else if (count < upperBoundArray[3]) {color = colors[1]}
+      else {color = colors[0]}
+      colorDict[key.toUpperCase()] = color;
+
+      var geoQuery = {
+        where: `APREC = '${key}'`,
+        returnGeometry: true,
+      }
+
+      areaFill.queryFeatures(geoQuery).then(function(result){
+        //console.log(colorDict[result.features[0].attributes.APREC]);
+        console.log(`${result.features[0].attributes.APREC} : ${colorDict[result.features[0].attributes.APREC]}`);
+        var geo = result.features[0].geometry;
+        var graphic = new Graphic({
+          geometry: geo,
+          symbol: {
+            type: "simple-fill",
+            color: colorDict[result.features[0].attributes.APREC]
+          },
+        });
+        graphicsLayer.add(graphic);
+
+      });
+      //console.log(colorDict);
+
+      /*var areaGeometry = new FeatureLayer({
+        url: "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/LAPD_Division/FeatureServer/0/query?where=APREC%20%3D%20'MISSION'&outFields=*&outSR=4326&f=json",
+        definitionExpression: `APREC = '${key}'`,
+        
+        renderer:{
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: color,
+            }
+          },
+        outFields: ["*"], //Put all fields as outfields
+        popupTemplate: {  // Enable a popup
+          title: "{APREC}", // Show attribute value
+          content: "PREC: {PREC} </br> Area: {AREA} miles squared"  // Display in pop-up
+        },
+        opacity: 0.5,
+        labelingInfo: [trailheadsLabels]
+      });
+
+      map.add(areaGeometry);*/
+    }
+    //map.add(areaOutlines);
+    //JSON.stringify(map.layers, null, 4);
+  }
+
+});
 
 
 
