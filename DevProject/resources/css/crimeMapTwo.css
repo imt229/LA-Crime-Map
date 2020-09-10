@@ -44,19 +44,35 @@ body {
   margin-left: 5px;
   padding-left: 2px;
   padding-right: 2px;
-  background-color: #FFFFFF;
   width: 250px;
   min-width: 250px;
   z-index: 1;
   position: absolute;
-}
-
-.arrow{
-
-  transform: rotateZ(270deg);
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-collapse: separate; 
+  background-color: #161A23;  
+  color: #E6E7E7; 
+  opacity: 75%;
 }
 
 #crimeArrow{
+  transform: rotateZ(180deg);
+  transition: all 0.4s ease;
+}
+
+#legendArrow{
+  transform: rotateZ(270deg);
+  transition: all 0.4s ease;
+}
+
+#mapTypeArrow{
+  transform: rotateZ(180deg);
+  transition: all 0.4s ease;
+}
+
+#dateArrow{
   transform: rotateZ(180deg);
   transition: all 0.4s ease;
 }
@@ -77,10 +93,10 @@ body {
   vertical-align: middle;
   line-height: 26px;
   padding-right: 4px;
-
+  padding-top: 3px;
 }
 
-.options{
+.content{
   padding-left: 20px;
   padding-top: 10px;
   height: 0px;
@@ -91,6 +107,17 @@ body {
   color: #E6E7E7;
 }
 
+#legendContent{
+  padding-left: 20px;
+  padding-top: 10px;
+  height: 160px;
+  width: 220px;
+  opacity: 100%;
+  transition: all 1s ease;
+  color: #E6E7E7;
+}
+
+/*
 #crimeType{
   border-radius: 4px;
   border-style: solid;
@@ -99,5 +126,62 @@ body {
   background-color: #161A23;  
   color: #E6E7E7; 
   opacity: 75%;
+}*/
+
+.wrapper{
+  border-width: 10px;
+  border-color: #ffffff;
+  background-color: #282f40;
+  border-radius: 3%;
+  margin: 8px 2px;
 }
+
+.radioWrapper{
+  margin-top: 2px;
+}
+
+.legendColor{
+  width: 20px;
+  height: 20px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+  padding-top: 2px;
+}
+
+.legendRangeWrapper{
+  display:flex;
+  margin: 7px auto;
+}
+
+.range{
+  padding-left: 5px;
+  padding-top: 2px;
+  font-size: 14px;
+  vertical-align: center;
+}
+
+#rangeOneColor{background-color: #ffdd00}
+#rangeTwoColor{background-color: #d3b700}
+#rangeThreeColor{background-color: #a79100}
+#rangeFourColor{background-color: #7a6a00}
+#rangeFiveColor{background-color: #4e4400}
+
+h6{
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+select{
+  width: 90px;
+  height: 30px;
+  font-size: 13px;
+  border-radius: 3px;
+  text-align: center;
+  background-color: #F9E13A;
+  margin-bottom: 10px;
+}
+
+
+
 
