@@ -1,8 +1,10 @@
 console.log("Javascript linked!");
 var areaFill;
+var areaOutlines;
 var map;
 var view;
-var graphicsLayer
+var graphicsLayer;
+var heatmap;
 require([
   "esri/Map",
   "esri/views/MapView",
@@ -11,7 +13,8 @@ require([
   "esri/layers/GraphicsLayer",
   "esri/Graphic"
 ], function (Map, MapView, FeatureLayer, CSVLayer, GraphicsLayer, Graphic) {
-
+  var areaUrl = "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/LAPD_Division/FeatureServer/0/query?where=APREC%20%3D%20'MISSION'&outFields=*&outSR=4326&f=json"
+  var crimeDataUrl = "https://services9.arcgis.com/2ynJbr9BE17vXxR8/arcgis/rest/services/arrest_data_from_2010_to_2019/FeatureServer"
 
   var trailheadsLabels = {
     symbol: {
@@ -43,9 +46,8 @@ require([
     zoom: 9.5
   });
 
-  var areaOutlines = new FeatureLayer({
-    url:
-      "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/LAPD_Division/FeatureServer/0/query?where=APREC%20%3D%20'MISSION'&outFields=*&outSR=4326&f=json",
+  areaOutlines = new FeatureLayer({
+    url: areaUrl,
     renderer: {
       type: "simple",
       symbol: {
@@ -59,8 +61,7 @@ require([
   });
 
   areaFill = new FeatureLayer({
-    url:
-      "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/LAPD_Division/FeatureServer/0/query?where=APREC%20%3D%20'MISSION'&outFields=*&outSR=4326&f=json",
+    url: areaUrl,
     renderer: {
       type: "simple",
       symbol: {
@@ -78,7 +79,32 @@ require([
     id: "fill"
   });
 
-  var graphicsLayer = new GraphicsLayer({
+  const heatMapColors = [ "#d9351a", "#ffc730", "#144d59", "#2c6954", "#ed9310", "#8c213f", "#102432", "#a64f1b", "#18382e", "#661510", "#b31515", "#4a0932" ];
+  heatMap = new FeatureLayer({
+    url: crimeDataUrl,
+    renderer: {
+      type: "heatmap",
+      colorStops: [
+        { color: "rgba(63, 40, 102, 0)", ratio: 0 },
+        { color: heatMapColors[1], ratio: 0.09},
+        { color: heatMapColors[2], ratio: 0.09 * 2 },
+        { color: heatMapColors[3], ratio: 0.09* 3 },
+        { color: heatMapColors[4], ratio: 0.09 * 4 },
+        { color: heatMapColors[5], ratio: 0.09 * 5 },
+        { color: heatMapColors[6], ratio: 0.09 * 6 },
+        { color: heatMapColors[7], ratio: 0.09* 7 },
+        { color: heatMapColors[8], ratio: 0.09 * 8 },
+        { color: heatMapColors[9], ratio: 0.09* 9 },
+        { color: heatMapColors[10], ratio: 0.09 * 10 },
+        { color: heatMapColors[11], ratio: 1 }
+      ],
+      maxPixelIntensity: 5000,
+      minPixelIntensity: 0
+    },
+  });
+
+
+  graphicsLayer = new GraphicsLayer({
     opacity: 0.75
   });
 
@@ -164,7 +190,7 @@ require([
       }
       index++;
       if (index == 21){
-        split(max, min);
+        createGraphics(max, min);
       }
     });
   }
@@ -201,15 +227,21 @@ require([
   //map.add(layer)
 
 
-  function split(max, min){
+  function createGraphics(max, min){
     var difference = max - min;
-    var sectionSize = difference/5;
+    var sectionSize = Math.round(difference/5);
     var upperBoundArray = [];
     var currentBound = min;
     var colorDict = {}
     for (var i = 0; i < 5; i++){
       currentBound += sectionSize;
       upperBoundArray.push(currentBound);
+
+      if (i == 0){document.querySelector("#rangeOneNumbers").innerHTML = `< ${currentBound}`;}
+      else if (i == 1){document.querySelector("#rangeTwoNumbers").innerHTML = `${currentBound} - ${currentBound - sectionSize}`;}
+      else if (i == 2){document.querySelector("#rangeThreeNumbers").innerHTML = `${currentBound} - ${currentBound - sectionSize}`;}
+      else if (i == 3){document.querySelector("#rangeFourNumbers").innerHTML = `${currentBound} - ${currentBound - sectionSize}`;}
+      else {document.querySelector("#rangeFiveNumbers").innerHTML = `> ${currentBound - sectionSize}`;}
     }
     //map.removeAll();
     //console.log(map.findLayerById("fill").renderer.symbol.color)
@@ -233,8 +265,6 @@ require([
       }
 
       areaFill.queryFeatures(geoQuery).then(function(result){
-        //console.log(colorDict[result.features[0].attributes.APREC]);
-        console.log(`${result.features[0].attributes.APREC} : ${colorDict[result.features[0].attributes.APREC]}`);
         var geo = result.features[0].geometry;
         var graphic = new Graphic({
           geometry: geo,
@@ -278,9 +308,14 @@ require([
 
 
 
-//Display Crime Options
+
+
+
+
+/////CRIME TYPE INTERACTION/////
+//Display Crime Options - Function that creates interaction with showing crime type options/arrow movement
 var displayCrimeType = false;
-document.querySelector(".optionHeaderWrapper").addEventListener("click", () => {
+document.querySelector("#crimeHeaderWrapper").addEventListener("click", () => {
   var crimeForm = document.querySelector("#crimeOptions");
   if (displayCrimeType) {
     crimeForm.style.height = "0px";
@@ -288,13 +323,13 @@ document.querySelector(".optionHeaderWrapper").addEventListener("click", () => {
     document.querySelector("#crimeArrow").style.transform = "rotateZ(180deg)";
     displayCrimeType = false;
   } else {
-    crimeForm.style.height = "135px";
+    crimeForm.style.height = "270px"; //260
     crimeForm.style.opacity = "100%";
     crimeForm.style.transform = "translateY(0)";
     displayCrimeType = true;
     document.querySelector("#crimeArrow").style.transform = "rotateZ(270deg)";
   }
-})
+});
 
 
 //Attach click function to radio elements
@@ -305,14 +340,189 @@ for (let i = 0; i < crimeTypeSelection.length; i++) {
 
 //Change of crime type
 function crimeSelectionChange(event) {
-  for (let i = 0; i < crimeTypeSelection.length; i++) {
-    if (crimeTypeSelection[i].checked) {
-      document.querySelector(".currentlySelected").innerHTML = crimeTypeSelection[i].value;
-      console.log(typeof crimeTypeSelection[i].value);
-      break;
+  document.querySelector("#crimeSelected").innerHTML = event.target.value;
+}
+
+
+////LEGEND INTERACTION//////
+//Display Legend - Function that creates interaction with showing legend/arrow movement
+var displayLegend = true;
+document.querySelector("#legendHeaderWrapper").addEventListener("click", () => {
+  var legend = document.querySelector("#legendContent");
+  if (displayLegend) {
+    legend.style.height = "0px";
+    legend.style.opacity = "0%";
+    document.querySelector("#legendArrow").style.transform = "rotateZ(180deg)";
+    displayLegend = false;
+  } else {
+    legend.style.height = "160px"; //260
+    legend.style.opacity = "100%";
+    legend.style.transform = "translateY(0)";
+    displayLegend = true;
+    document.querySelector("#legendArrow").style.transform = "rotateZ(270deg)";
+  }
+});
+
+////MAP TYPE INTERACTION//////////
+var displayMapType = false;
+document.querySelector("#mapTypeHeaderWrapper").addEventListener("click", () => {
+  var mapOptions = document.querySelector("#mapOptions");
+  if (displayMapType) {
+    mapOptions.style.height = "0px";
+    mapOptions.style.opacity = "0%";
+    document.querySelector("#mapTypeArrow").style.transform = "rotateZ(180deg)";
+    displayMapType = false;
+  } else {
+    mapOptions.style.height = "70px"; //260
+    mapOptions.style.opacity = "100%";
+    mapOptions.style.transform = "translateY(0)";
+    displayMapType = true;
+    document.querySelector("#mapTypeArrow").style.transform = "rotateZ(270deg)";
+  }
+});
+
+//Attach click function to radio elements
+var mapTypeSelection = document.getElementsByName("mapType");
+for (let i = 0; i < mapTypeSelection.length; i++) {
+  mapTypeSelection[i].addEventListener("click", mapSelectionChange);
+}
+
+//Change of crime type
+function mapSelectionChange(event) {
+  var mapType = event.target.value;
+  document.querySelector("#mapTypeSelected").innerHTML = mapType;
+  map.removeAll();
+  if (mapType == "Heat Map"){
+    map.add(heatMap);
+  } else if(mapType == "Area Map"){
+    map.add(areaOutlines);
+    map.add(areaFill);
+    map.add(graphicsLayer);
+  }
+}
+
+////DATE RANGE INTERACTION//////////
+var displayDateRange = false;
+document.querySelector("#dateHeaderWrapper").addEventListener("click", () => {
+  var dateRange = document.querySelector("#dateContent");
+  if (displayDateRange) {
+    dateRange.style.height = "0px";
+    dateRange.style.opacity = "0%";
+    document.querySelector("#dateArrow").style.transform = "rotateZ(180deg)";
+    displayDateRange = false;
+  } else {
+    dateRange.style.height = "150px"; //260
+    dateRange.style.opacity = "100%";
+    dateRange.style.transform = "translateY(0)";
+    displayDateRange = true;
+    document.querySelector("#dateArrow").style.transform = "rotateZ(270deg)";
+  }
+});
+
+//Attach click function to select elements
+var dateSelection = document.getElementsByTagName("select");
+for (let i = 0; i < dateSelection.length; i++) {
+  dateSelection[i].addEventListener("click", dateSelectionChange);
+}
+
+var startDate = "January 2020";
+var endDate = "September 2020";
+var monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var yearArray = ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"];
+function dateSelectionChange(event) {
+  var selectArray = document.getElementsByTagName("select");
+  var newStartDate = "";
+  var newEndDate = "";
+
+  for (var i = 0; i < selectArray.length; i++){
+    var selectionValue =  selectArray[i].options[selectArray[i].selectedIndex].text;
+    if (i == 0){newStartDate += selectionValue + " ";} //start month
+    else if (i == 1){newStartDate += selectionValue;}
+    else if (i == 2){newEndDate += selectionValue + " ";} //end month
+    else{newEndDate += selectionValue;}
+  }
+   //Detect if the date has changed
+  if (startDate != newStartDate || endDate != newEndDate){
+    startDate = newStartDate;
+    endDate = newEndDate;
+    var changedClass = event.target.className;
+    var startYear = startDate.split(" ")[1];
+    var startMonth = startDate.split(" ")[0];
+    var endYear = endDate.split(" ")[1];
+    var endMonth = endDate.split(" ")[0];
+
+
+    //Changing Possible Selections based on what new selection is
+    //Wipe clean selection options and add new options from arrays above
+    //If years are different, we can safely add all months back to selection
+    if (startYear != endYear){
+      //Adding all months for start
+      selectArray[0].options.length = 0;
+      for (month of monthArray){
+        var option = document.createElement("option")
+        option.text = month;
+        if (month == startMonth){option.setAttribute('selected', 'selected');}
+        selectArray[0].add(option);     
+      }
+      //Adding all months for End
+      selectArray[2].options.length = 0;
+      for (month of monthArray){
+        var option = document.createElement("option")
+        option.text = month;
+        if (month == endMonth){option.setAttribute('selected', 'selected');}
+        selectArray[2].add(option);     
+      }
+      
+    }
+
+    //If start date changed, need to add options for end date
+    //Iterate through arrays until we hit the year/month for start date
+    if (changedClass == "startDate"){
+      //Adding years to end selection
+      selectArray[3].options.length = 0; //set end year selection to empty
+      for (var i = 10; i > 0; i--){
+        var option = document.createElement("option")
+        option.text = yearArray[i];
+        //Check if this is selected option and set it to selected
+        if (yearArray[i] == endYear){option.setAttribute('selected', 'selected');}
+        selectArray[3].add(option,0);
+        if (yearArray[i] == startYear){break;}
+      }
+
+      //Adding Months to end selection if years are the same
+      if(startYear == endYear){
+        selectArray[2].options.length = 0;
+        for (var i = 11; i > 0; i--){
+          var option = document.createElement("option")
+          option.text = monthArray[i];
+          if (monthArray[i] == endMonth){option.setAttribute('selected', 'selected');}
+          selectArray[2].add(option,0);
+          if (monthArray[i] == startMonth){break;}      
+        }
+      }
+    } else{
+      //If the end date has changed
+      selectArray[1].options.length = 0; //set start year selection to empty
+      for (var i = 0; i < 11; i++){
+        var option = document.createElement("option")
+        option.text = yearArray[i];
+        if (yearArray[i] == startYear){option.setAttribute('selected', 'selected');}
+        selectArray[1].add(option);
+        if (yearArray[i] == endYear){break;}
+      }
+      //adding months to start selection
+      if(startYear == endYear){
+        selectArray[0].options.length = 0;
+        for (var i = 0; i < 12; i++){
+          var option = document.createElement("option")
+          option.text = monthArray[i];
+          if (monthArray[i] == startMonth){option.setAttribute('selected', 'selected');}
+          selectArray[0].add(option);
+          if (monthArray[i] == endMonth){break;}      
+        }
+      }
     }
   }
-
 }
 
 //https://data.lacity.org/resource/2nrs-mtv8.csv
