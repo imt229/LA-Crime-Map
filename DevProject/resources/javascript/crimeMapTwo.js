@@ -480,7 +480,7 @@ function dateSelectionChange(event) {
     if (changedClass == "startDate"){
       //Adding years to end selection
       selectArray[3].options.length = 0; //set end year selection to empty
-      for (var i = 10; i > 0; i--){
+      for (var i = 10; i > -1; i--){
         var option = document.createElement("option")
         option.text = yearArray[i];
         //Check if this is selected option and set it to selected
@@ -491,13 +491,32 @@ function dateSelectionChange(event) {
 
       //Adding Months to end selection if years are the same
       if(startYear == endYear){
+        //Iterate through array, if we hit the start month but haven't hit the end month that was selected
+        //Means end month was before start month after change. Set the new end month to the start month
+        var selectedAdded = false;
         selectArray[2].options.length = 0;
         for (var i = 11; i > 0; i--){
           var option = document.createElement("option")
           option.text = monthArray[i];
-          if (monthArray[i] == endMonth){option.setAttribute('selected', 'selected');}
-          selectArray[2].add(option,0);
-          if (monthArray[i] == startMonth){break;}      
+          if (monthArray[i] == endMonth){option.setAttribute('selected', 'selected'); selectedAdded = true;}
+          if (monthArray[i] == startMonth){
+            if(selectedAdded){selectArray[2].add(option,0);}
+            else{
+              endMonth = startMonth;
+              option.setAttribute('selected', 'selected'); 
+              selectArray[2].add(option,0);
+            }
+            break;
+          } else{selectArray[2].add(option,0);}    
+        }
+
+        selectArray[0].options.length = 0;
+        for (var i = 0; i < 12; i++){
+          var option = document.createElement("option")
+          option.text = monthArray[i];
+          if (monthArray[i] == startMonth){option.setAttribute('selected', 'selected');}
+          selectArray[0].add(option);
+          if (monthArray[i] == endMonth){break;}   
         }
       }
     } else{
@@ -512,16 +531,38 @@ function dateSelectionChange(event) {
       }
       //adding months to start selection
       if(startYear == endYear){
+        var selectedAdded = false;
         selectArray[0].options.length = 0;
         for (var i = 0; i < 12; i++){
           var option = document.createElement("option")
           option.text = monthArray[i];
-          if (monthArray[i] == startMonth){option.setAttribute('selected', 'selected');}
-          selectArray[0].add(option);
-          if (monthArray[i] == endMonth){break;}      
+          if (monthArray[i] == startMonth){option.setAttribute('selected', 'selected'); selectedAdded = true;}
+          if (monthArray[i] == endMonth){
+            if(selectedAdded){selectArray[0].add(option);}
+            else{
+              startMonth = endMonth;
+              option.setAttribute('selected', 'selected'); 
+              selectArray[0].add(option);
+            }
+            break;
+          } else{selectArray[0].add(option);}      
+        }
+
+        selectArray[2].options.length = 0;
+        for (var i = 11; i > -1; i--){
+          var option = document.createElement("option")
+          option.text = monthArray[i];
+          if (monthArray[i] == endMonth){option.setAttribute('selected', 'selected');}
+          selectArray[2].add(option,0);
+          if (monthArray[i] == startMonth){break;}  
         }
       }
     }
+    /*
+    console.log(startYear);
+    console.log(startMonth);
+    console.log(endYear);
+    console.log(endMonth);*/
   }
 }
 
